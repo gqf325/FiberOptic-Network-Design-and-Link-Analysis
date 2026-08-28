@@ -1,0 +1,42 @@
+{
+  "system": {
+    "nominal_wavelength_nm": 1550,
+    "tx_power_mw": 2.0,
+    "min_snr_db": 13,
+    "max_edfa_output_mw": 5.0,
+    "max_rx_power_mw": 0.5
+  },
+
+  "modulator": {
+    "10g": {
+      "insertion_loss_db": 2.5
+    },
+    "40g": {
+      "insertion_loss_db": 12.5
+    }
+  },
+
+  "fiber": {
+    "attenuation_db_per_km": 0.20,
+    "dispersion_ps_per_nm_km": 18,
+    "gamma_per_w_km": 1.43,
+    "effective_area_um2": 85
+  },
+
+  "edfa": {
+    "gain_min_db": 16,
+    "gain_max_db": 20,
+    "noise_figure_db": 4.5
+  },
+
+ "wdm": {
+  "mux_insertion_loss_db": {
+    "typical": 2.0,
+    "maximum": 2.4
+  },
+  "demux_insertion_loss_db": {
+    "typical": 2.0,
+    "maximum": 2.4
+  }
+}
+}

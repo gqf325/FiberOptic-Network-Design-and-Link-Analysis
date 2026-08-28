@@ -95,19 +95,53 @@ This allocation results in a total of 32 channel instances across all end-to-end
 | D → B | 30 Gb/s | 10 + 10 + 10 | 3 |
 | D → C | 60 Gb/s | 40 + 10 + 10 | 3 |
 ### Logical Wavelength Assignment
-- assignment rules
-- λ1–λ9
-- detailed wavelength table
+The wavelength assignment is designed to use the minimum number of logical wavelength slots while avoiding wavelength conflicts on each directed fiber. The following rules are applied:
+
+- The same wavelength cannot be assigned to multiple independent channels on the same directed fiber.
+- The same wavelength can be reused on different physical fibers when no conflict occurs.
+- For transit traffic passing through node B, wavelength continuity is maintained. For example, if an A → C channel uses $\lambda_4$ on the A → B link, it continues to use $\lambda_4$ on the B → C link without wavelength conversion.
+- $\lambda_1$–$\lambda_9$ are logical wavelength labels. Their physical wavelength values will be determined later according to the selected WDM components.
+
+| Demand | Data Rate | Channel Allocation | Assigned Wavelengths | Route | B Operation |
+| --- | ---: | --- | --- | --- | --- |
+| A → B | 60 Gb/s | 40 + 10 + 10 | λ1 (40G), λ2 (10G), λ3 (10G) | A-B | DROP |
+| A → C | 50 Gb/s | 40 + 10 | λ4 (40G), λ5 (10G) | A-B-C | PASS → C |
+| A → D | 50 Gb/s | 40 + 10 | λ6 (40G), λ7 (10G) | A-B-D | PASS → D |
+| B → A | 70 Gb/s | 40 + 10 + 10 + 10 | λ6 (40G), λ7 (10G), λ8 (10G), λ9 (10G) | B-A | ADD |
+| B → C | 30 Gb/s | 10 + 10 + 10 | λ1 (10G), λ2 (10G), λ3 (10G) | B-C | ADD |
+| B → D | 20 Gb/s | 10 + 10 | λ1 (10G), λ2 (10G) | B-D | ADD |
+| C → A | 30 Gb/s | 10 + 10 + 10 | λ1 (10G), λ2 (10G), λ3 (10G) | C-B-A | PASS → A |
+| C → B | 50 Gb/s | 40 + 10 | λ6 (40G), λ7 (10G) | C-B | DROP |
+| C → D | 30 Gb/s | 10 + 10 + 10 | λ4 (10G), λ5 (10G), λ8 (10G) | C-B-D | PASS → D |
+| D → A | 20 Gb/s | 10 + 10 | λ4 (10G), λ5 (10G) | D-B-A | PASS → A |
+| D → B | 30 Gb/s | 10 + 10 + 10 | λ1 (10G), λ2 (10G), λ3 (10G) | D-B | DROP |
+| D → C | 60 Gb/s | 40 + 10 + 10 | λ6 (40G), λ7 (10G), λ8 (10G) | D-B-C | PASS → C |
 ### Wavelength Routing at Node B
-- ADD
-- DROP
-- PASS
-- wavelength continuity
-### Wavelength Utilization
-- channels per directed fiber
-- maximum = 9
-- minimum required logical wavelength slots = 9
+B serves as the central city node.Each wavelength channel arriving at or originating from B is handled using one of the following operations:
+- **DROP:** The wavelength channel terminates at node B and is removed from the incoming WDM signal for local reception.
+- **ADD:** A wavelength channel carrying traffic generated at node B is inserted into the corresponding outgoing WDM fiber.
+- **PASS:** The wavelength channel is transit traffic whose destination is another node. It remains in the optical domain and is routed through node B to the appropriate outgoing fiber.
+
+For PASS traffic, wavelength continuity is maintained across node B in this design, and no wavelength conversion is used.<br>
+**Examples**
+- A → B: Drop at B
+- B → C: Add at B
+- A → C: Pass B
+### Directed Fiber Channel Load
+- Maximum: 9 channels
+  
+| Directed Fiber Segment | Traffic Carried on This Fiber | Total Data Rate | Number of Wavelength Channels |
+| --- | --- | ---: | ---: |
+| A → B fiber | A→B, A→C, A→D | 160 Gb/s | 7 |
+| B → A fiber | B→A, C→A, D→A | 120 Gb/s | 9 |
+| B → C fiber | A→C, B→C, D→C | 140 Gb/s | 8 |
+| C → B fiber | C→A, C→B, C→D | 110 Gb/s | 8 |
+| B → D fiber | A→D, B→D, C→D | 100 Gb/s | 7 |
+| D → B fiber | D→A, D→B, D→C | 110 Gb/s | 8 |
+max(7, 9, 8, 8, 7, 8) = 9
+The proposed assignment uses nine logical wavelength slots. The B → A fiber carries the largest number of simultaneous channels, requiring nine wavelength slots.
 ## Component Selection
+
 ## Link Analysis
 
 ### Power Budget
