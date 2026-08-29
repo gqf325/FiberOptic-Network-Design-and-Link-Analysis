@@ -1,0 +1,125 @@
+{
+  "A-B": {
+    "length_km": 320,
+    "amplifiers": [
+      {
+        "position_km": 0,
+        "gain_db": null
+      },
+      {
+        "position_km": 100,
+        "gain_db": null
+      },
+      {
+        "position_km": 190,
+        "gain_db": null
+      },
+      {
+        "position_km": 320,
+        "gain_db": null
+      }
+    ]
+  },
+
+  "B-A": {
+    "length_km": 320,
+    "amplifiers": [
+      {
+        "position_km": 0,
+        "gain_db": null
+      },
+      {
+        "position_km": 130,
+        "gain_db": null
+      },
+      {
+        "position_km": 220,
+        "gain_db": null
+      },
+      {
+        "position_km": 320,
+        "gain_db": null
+      }
+    ]
+  },
+
+  "B-C": {
+    "length_km": 400,
+    "amplifiers": [
+      {
+        "position_km": 80,
+        "gain_db": null
+      },
+      {
+        "position_km": 195,
+        "gain_db": null
+      },
+      {
+        "position_km": 315,
+        "gain_db": null
+      },
+      {
+        "position_km": 400,
+        "gain_db": null
+      }
+    ]
+  },
+
+  "C-B": {
+    "length_km": 400,
+    "amplifiers": [
+      {
+        "position_km": 0,
+        "gain_db": null
+      },
+      {
+        "position_km": 85,
+        "gain_db": null
+      },
+      {
+        "position_km": 205,
+        "gain_db": null
+      },
+      {
+        "position_km": 320,
+        "gain_db": null
+      },
+      {
+        "position_km": 400,
+        "gain_db": null
+      }
+    ]
+  },
+
+  "B-D": {
+    "length_km": 180,
+    "amplifiers": [
+      {
+        "position_km": 110,
+        "gain_db": null
+      },
+      {
+        "position_km": 180,
+        "gain_db": null
+      }
+    ]
+  },
+
+  "D-B": {
+    "length_km": 180,
+    "amplifiers": [
+      {
+        "position_km": 0,
+        "gain_db": null
+      },
+      {
+        "position_km": 70,
+        "gain_db": null
+      },
+      {
+        "position_km": 180,
+        "gain_db": null
+      }
+    ]
+  }
+}
