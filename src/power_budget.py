@@ -426,6 +426,7 @@ def propagate_link(
             trace.append({
                 "stage": f"Fiber ({span_length} km)",
                 "position_km": position,
+                "span_length_km": span_length,
                 "power_dbm": power_dbm,
                 "power_mw": dbm_to_mw(power_dbm),
                 "power_limit_status": "PASS"
@@ -515,6 +516,7 @@ def propagate_link(
         trace.append({
             "stage": f"Fiber ({remaining_length} km)",
             "position_km": link["length_km"],
+            "span_length_km": remaining_length,
             "power_dbm": power_dbm,
             "power_mw": dbm_to_mw(power_dbm),
             "power_limit_status": "PASS"
@@ -547,7 +549,7 @@ def calculate_route_power(
     network,
     constraints,
     loss_case="typical",
-    target_link_input_dbm=None
+    target_input_by_link=None
 ):
     """
     Propagate one wavelength channel through a complete route.
@@ -649,7 +651,12 @@ def calculate_route_power(
             # Channel power leveling
             # ------------------------------------------------
 
-            if target_link_input_dbm is not None:
+            if target_input_by_link is not None:
+                next_link = links[i+1]
+
+                target_power_dbm = (
+                    target_input_by_link[next_link]
+                )
 
                 (
                     power_dbm,
@@ -657,9 +664,7 @@ def calculate_route_power(
                     leveling_status
                 ) = equalize_channel_power(
                     input_power_dbm=power_dbm,
-                    target_power_dbm=(
-                        target_link_input_dbm
-                    )
+                    target_power_dbm=target_power_dbm
                 )
 
             else:
@@ -689,7 +694,8 @@ def calculate_route_power(
                 # Separate leveling check
                 "leveling_status": (
                     leveling_status
-                )
+                ),
+                "leveling_attenuation_db": attenuation_db,
             })
 
     # ========================================================
