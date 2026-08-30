@@ -40,6 +40,8 @@
 },
 
   "fiber": {
+    "model": "F-SMF-28",
+    "type": "single-mode optical fiber",
     "attenuation_db_per_km": 0.20,
     "dispersion_ps_per_nm_km": 18,
     "gamma_per_w_km": 1.43,
