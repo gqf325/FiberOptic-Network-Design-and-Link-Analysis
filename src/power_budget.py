@@ -42,6 +42,123 @@ def calculate_tx_power_for_target(
 
     return dbm_to_mw(tx_power_dbm)
 
+def calculate_safe_launch_targets(
+    network,
+    gains_by_link,
+    components,
+    constraints,
+    modulator_loss_db,
+    mux_loss_db,
+    dispersion_compensation=None
+):
+    """
+    Calculate a safe launch-power target for each directed link.
+
+    The launch target is limited by:
+
+    1. Maximum transmitter power after modulator and MUX losses.
+    2. Maximum allowed output power of every EDFA on the link.
+
+    Returns
+    -------
+    target_input_by_link : dict
+        Safe per-channel launch power in dBm for each
+        directed fiber link.
+    """
+    if dispersion_compensation is None:
+        dispersion_compensation = {}
+
+    attenuation_db_per_km = (
+        components["fiber"][
+            "attenuation_db_per_km"
+        ]
+    )
+
+    tx_power_max_mw = constraints[
+        "tx_power_max_mw_per_channel"
+    ]
+
+    edfa_output_max_mw = constraints[
+        "edfa_output_max_mw_per_channel"
+    ]
+
+    # Maximum launch allowed by transmitter hardware
+    tx_limited_launch_dbm = (
+        mw_to_dbm(tx_power_max_mw)
+        - modulator_loss_db
+        - mux_loss_db
+    )
+
+    edfa_output_max_dbm = (
+        mw_to_dbm(edfa_output_max_mw)
+    )
+
+    target_input_by_link = {}
+
+    for link_name, link in network.items():
+
+        amplifiers = link["amplifiers"]
+        gains_db = gains_by_link[link_name]
+
+        # Start with transmitter limit
+        safe_launch_dbm = (
+            tx_limited_launch_dbm
+        )
+
+        cumulative_gain_db = 0.0
+        cumulative_dcm_loss_db = 0.0
+
+        # ----------------------------------------------------
+        # Check EVERY EDFA
+        # ----------------------------------------------------
+
+        for amplifier, gain_db in zip(amplifiers,gains_db):
+
+            position_km = amplifier[
+                "position_km"
+            ]
+
+            dcm_config = (
+                dispersion_compensation.get(
+                    link_name
+                )
+            )
+
+            if (
+                dcm_config is not None
+                and dcm_config["position_km"]
+                == position_km
+            ):
+                cumulative_dcm_loss_db += (
+                    dcm_config[
+                        "total_insertion_loss_db"
+                    ]
+                )
+
+            cumulative_gain_db += gain_db
+
+            fiber_loss_to_edfa_db = (
+                position_km
+                * attenuation_db_per_km
+            )
+
+            edfa_limited_launch_dbm = (
+                edfa_output_max_dbm
+                + fiber_loss_to_edfa_db
+                + cumulative_dcm_loss_db
+                - cumulative_gain_db
+            )
+
+            safe_launch_dbm = min(
+                safe_launch_dbm,
+                edfa_limited_launch_dbm
+            )
+
+        target_input_by_link[
+                    link_name
+                ] = safe_launch_dbm
+
+    return target_input_by_link
 
 # ============================================================
 # Channel power equalization
@@ -334,6 +451,7 @@ def propagate_link(
     components,
     network,
     constraints,
+    dispersion_compensation=None,
     include_endpoint_amplifier=True
 ):
     """
@@ -359,6 +477,8 @@ def propagate_link(
         This is used when a channel terminates at that node
         and is dropped to the receiver.
     """
+    if dispersion_compensation is None:
+        dispersion_compensation = {}
 
     link = network[link_name]
 
@@ -369,6 +489,14 @@ def propagate_link(
     max_edfa_output_mw = constraints[
         "edfa_output_max_mw_per_channel"
     ]
+
+    edfa_input_min_dbm = components["edfa"][
+    "input_power_min_dbm"
+]
+
+    edfa_input_max_dbm = components["edfa"][
+    "input_power_max_dbm"
+]
 
     amplifiers = link["amplifiers"]
 
@@ -435,6 +563,39 @@ def propagate_link(
         current_position = position
 
         # ----------------------------------------------------
+        # DCM insertion loss
+        # ----------------------------------------------------
+
+        dcm_config = dispersion_compensation.get(
+            link_name
+        )
+
+        if (
+            dcm_config is not None
+            and dcm_config["position_km"] == position
+        ):
+
+            dcm_loss_db = (
+                dcm_config[
+                    "total_insertion_loss_db"
+                ]
+            )
+
+            power_dbm -= dcm_loss_db
+
+            trace.append({
+                "stage": (
+                    f"DCM loss ({dcm_loss_db:.2f} dB)"
+                ),
+                "position_km": position,
+                "power_dbm": power_dbm,
+                "power_mw": dbm_to_mw(
+                    power_dbm
+                ),
+                "power_limit_status": "PASS"
+            })
+
+        # ----------------------------------------------------
         # Endpoint amplifier check
         # ----------------------------------------------------
 
@@ -463,14 +624,28 @@ def propagate_link(
         # EDFA input
         # ----------------------------------------------------
 
+        edfa_input_status = (
+        "PASS"
+        if (
+            edfa_input_min_dbm
+            <= power_dbm
+            <= edfa_input_max_dbm
+         )
+        else "FAIL"
+)
+
         trace.append({
             "stage": "EDFA input",
             "position_km": position,
             "power_dbm": power_dbm,
             "power_mw": dbm_to_mw(power_dbm),
-            "power_limit_status": "PASS"
-        })
 
+            "power_limit_status": "PASS",
+
+            "edfa_input_status": (
+                edfa_input_status
+            )
+})
         # ----------------------------------------------------
         # EDFA output
         # ----------------------------------------------------
@@ -548,8 +723,9 @@ def calculate_route_power(
     components,
     network,
     constraints,
-    loss_case="typical",
-    target_input_by_link=None
+    loss_case="design",
+    target_input_by_link=None,
+    dispersion_compensation=None
 ):
     """
     Propagate one wavelength channel through a complete route.
@@ -602,9 +778,8 @@ def calculate_route_power(
             components=components,
             network=network,
             constraints=constraints,
-            include_endpoint_amplifier=(
-                not is_last_link
-            )
+            dispersion_compensation=(dispersion_compensation),
+            include_endpoint_amplifier=(not is_last_link)
         )
 
         # Add link name to trace

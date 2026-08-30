@@ -1,7 +1,6 @@
 {
   "tx_power_max_mw_per_channel": 2.0,
   "rx_power_max_mw_per_channel": 0.5,
-  "edfa_gain_max_db": 20,
   "edfa_output_max_mw_per_channel": 5.0,
   "receiver_snr_min_db": 13,
   "nonlinear_phase_max_rad": 3.141592653589793

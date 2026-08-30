@@ -99,6 +99,7 @@ def propagate_ase_link(
     components,
     network,
     noise_bandwidth_hz,
+    dispersion_compensation=None,
     include_endpoint_amplifier=True
 ):
     """
@@ -118,6 +119,8 @@ def propagate_ase_link(
         If False, an EDFA located exactly at the destination
         node is bypassed for a DROP channel.
     """
+    if dispersion_compensation is None:
+        dispersion_compensation = {}
 
     link = network[link_name]
 
@@ -187,6 +190,39 @@ def propagate_ase_link(
             })
 
         current_position = position
+
+        # ----------------------------------------------------
+        # DCM insertion loss
+        # ----------------------------------------------------
+
+        dcm_config = dispersion_compensation.get(
+            link_name
+        )
+
+        if (
+            dcm_config is not None
+            and dcm_config["position_km"] == position
+        ):
+
+            dcm_loss_db = (
+                dcm_config[
+                    "total_insertion_loss_db"
+                ]
+            )
+
+            dcm_transmission = (
+                10 ** (-dcm_loss_db / 10)
+            )
+
+            ase_w *= dcm_transmission
+
+            trace.append({
+                "stage": (
+                    f"DCM loss ({dcm_loss_db:.2f} dB)"
+                ),
+                "position_km": position,
+                "ase_w": ase_w
+            })
 
         # ----------------------------------------------------
         # Endpoint EDFA bypass for DROP channel
@@ -305,7 +341,8 @@ def calculate_route_ase(
     components,
     network,
     noise_bandwidth_hz,
-    leveling_losses_db=None
+    leveling_losses_db=None,
+    dispersion_compensation=None
 ):
     """
     Propagate ASE noise through a complete optical route.
@@ -388,6 +425,9 @@ def calculate_route_ase(
             components=components,
             network=network,
             noise_bandwidth_hz=noise_bandwidth_hz,
+            dispersion_compensation=(
+                dispersion_compensation
+            ),
             include_endpoint_amplifier=(
                 not is_last_link
             )

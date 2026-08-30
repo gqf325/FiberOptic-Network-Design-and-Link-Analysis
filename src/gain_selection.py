@@ -1,25 +1,68 @@
-# 我们事先规定了一切EDFA的gain 在16-20dB之间，这段脚本用于自动选择合适的gain大小
+# ============================================================
+# Generate initial EDFA gains
+# ============================================================
+
 def generate_initial_gains(
     network,
-    components
+    components,
+    dispersion_compensation=None
 ):
     """
     Generate an initial EDFA gain configuration for all
     directed fiber links.
 
-    The initial gain of each EDFA is based on the loss of
-    the preceding fiber span, limited by the EDFA gain range.
+    The initial gain of each EDFA is based on the total loss
+    immediately before that EDFA, including:
+
+    - preceding fiber-span loss
+    - DCM insertion loss, if a DCM is placed before this EDFA
+
+    The calculated gain is limited by the commercial EDFA
+    gain range.
+
+    Parameters
+    ----------
+    network : dict
+        Network configuration containing link lengths and
+        amplifier positions.
+
+    components : dict
+        Component parameters, including fiber attenuation
+        and EDFA gain limits.
+
+    dispersion_compensation : dict or None
+        DCM placement and insertion-loss configuration.
+
+        Example:
+        {
+            "A-B": {
+                "position_km": 190,
+                "total_insertion_loss_db": 3.7
+            }
+        }
 
     Returns
     -------
     gains_by_link : dict
+        Initial EDFA gain configuration.
 
         Example:
         {
-            "A-B": [16, 20, 18, 20],
-            "B-C": [16, 20, 20, 17]
+            "A-B": [15, 20, 21.7, 26],
+            "B-C": [...]
         }
     """
+
+    # --------------------------------------------------------
+    # Default: no DCM
+    # --------------------------------------------------------
+
+    if dispersion_compensation is None:
+        dispersion_compensation = {}
+
+    # --------------------------------------------------------
+    # Component parameters
+    # --------------------------------------------------------
 
     attenuation = components["fiber"][
         "attenuation_db_per_km"
@@ -35,7 +78,10 @@ def generate_initial_gains(
 
     gains_by_link = {}
 
+    # --------------------------------------------------------
     # Go through every directed fiber
+    # --------------------------------------------------------
+
     for link_name, link_data in network.items():
 
         amplifiers = link_data["amplifiers"]
@@ -44,40 +90,97 @@ def generate_initial_gains(
 
         previous_position = 0
 
+        # ----------------------------------------------------
+        # Go through every EDFA on this link
+        # ----------------------------------------------------
+
         for amplifier in amplifiers:
 
-            position = amplifier["position_km"]
+            position = amplifier[
+                "position_km"
+            ]
 
-            # Length of fiber before this amplifier
-            span_length_km = position - previous_position
+            # ------------------------------------------------
+            # 1. Fiber span before this amplifier
+            # ------------------------------------------------
 
-            # Corresponding fiber loss
-            span_loss_db = (
-                span_length_km * attenuation
+            span_length_km = (
+                position
+                - previous_position
             )
 
-            # Use span loss as initial gain,
-            # but keep it within the EDFA gain range.
+            span_loss_db = (
+                span_length_km
+                * attenuation
+            )
+
+            # ------------------------------------------------
+            # 2. DCM loss before this amplifier
+            # ------------------------------------------------
+
+            dcm_loss_db = 0.0
+
+            dcm_config = (
+                dispersion_compensation.get(
+                    link_name
+                )
+            )
+
+            if (
+                dcm_config is not None
+                and dcm_config["position_km"]
+                == position
+            ):
+                dcm_loss_db = (
+                    dcm_config[
+                        "total_insertion_loss_db"
+                    ]
+                )
+
+            # ------------------------------------------------
+            # 3. Total loss immediately before EDFA
+            # ------------------------------------------------
+
+            total_loss_before_edfa_db = (
+                span_loss_db
+                + dcm_loss_db
+            )
+
+            # ------------------------------------------------
+            # 4. Use total preceding loss as initial gain
+            #
+            # Keep gain inside commercial EDFA range:
+            # 15 dB <= G <= 33 dB
+            # ------------------------------------------------
+
             gain_db = max(
                 min_gain_db,
-                min(span_loss_db, max_gain_db)
+                min(
+                    total_loss_before_edfa_db,
+                    max_gain_db
+                )
             )
 
-            link_gains.append(gain_db)
+            link_gains.append(
+                gain_db
+            )
 
+            # Move to next span
             previous_position = position
 
-        gains_by_link[link_name] = link_gains
+        gains_by_link[
+            link_name
+        ] = link_gains
 
     return gains_by_link
-
 # gain refinement 校正gain
 def refine_transit_endpoint_gains(
     initial_gains,
     channels,
     target_input_by_link,
     network,
-    components
+    components,
+    dispersion_compensation=None
 ):
     """
     Refine endpoint EDFA gains for transit channels.
@@ -99,6 +202,9 @@ def refine_transit_endpoint_gains(
     adjustment_report : list
         Information about every transit-link gain check.
     """
+
+    if dispersion_compensation is None:
+        dispersion_compensation = {}
 
     # Copy the gain dictionary so that initial_gains
     # itself is not modified.
@@ -197,11 +303,23 @@ def refine_transit_endpoint_gains(
             refined_gains[current_link]
         )
 
+        dcm_config = dispersion_compensation.get(
+        current_link
+    )
+
+        if dcm_config is not None:
+            total_dcm_loss_db = dcm_config[
+                "total_insertion_loss_db"
+            ]
+        else:
+            total_dcm_loss_db = 0.0
+
         output_before_dbm = (
-            input_power_dbm
-            - total_fiber_loss_db
-            + total_gain_db
-        )
+                input_power_dbm
+                - total_fiber_loss_db
+                - total_dcm_loss_db
+                + total_gain_db
+            )
 
         # ----------------------------------------------------
         # Find strongest target required by downstream links

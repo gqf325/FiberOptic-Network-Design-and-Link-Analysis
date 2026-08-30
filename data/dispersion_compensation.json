@@ -1,0 +1,49 @@
+{
+  "A-B": {
+    "model": "DCM-HDC",
+    "position_km": 190,
+    "modules": 1,
+    "compensation_ps_per_nm": -5760,
+    "total_insertion_loss_db": 3.7
+  },
+
+  "B-A": {
+    "model": "DCM-HDC",
+    "position_km": 220,
+    "modules": 1,
+    "compensation_ps_per_nm": -5760,
+    "total_insertion_loss_db": 3.7
+  },
+
+  "B-C": {
+    "model": "DCM-HDC",
+    "position_km": 315,
+    "modules": 1,
+    "compensation_ps_per_nm": -7200,
+    "total_insertion_loss_db": 3.7
+  },
+
+  "C-B": {
+    "model": "DCM-HDC",
+    "position_km": 320,
+    "modules": 1,
+    "compensation_ps_per_nm": -7200,
+    "total_insertion_loss_db": 3.7
+  },
+
+  "B-D": {
+    "model": "DCM-CB",
+    "position_km": 110,
+    "modules": 2,
+    "compensation_ps_per_nm": -3240,
+    "total_insertion_loss_db": 7.4
+  },
+
+  "D-B": {
+    "model": "DCM-CB",
+    "position_km": 70,
+    "modules": 2,
+    "compensation_ps_per_nm": -3240,
+    "total_insertion_loss_db": 7.4
+  }
+}

@@ -6,15 +6,38 @@
     "max_edfa_output_mw": 5.0,
     "max_rx_power_mw": 0.5
   },
+  "laser": {
+    "manufacturer": "Box Optronics",
+    "type": "DWDM DFB butterfly laser diode",
+    "operation": "CW",
+    "output_power_mw": 2.0,
+    "wavelength_grid": "ITU DWDM",
+    "wavelength_range_nm": [
+        1528.77,
+        1610.06
+    ],
+    "connector": "FC/APC"
+},
 
   "modulator": {
     "10g": {
-      "insertion_loss_db": 2.5
+        "manufacturer": "Exail",
+        "model": "MX-LN-10",
+        "type": "LiNbO3 Mach-Zehnder intensity modulator",
+        "bandwidth_ghz": 10,
+        "insertion_loss_db": 3.5,
+        "insertion_loss_max_db": 4.5
     },
+
     "40g": {
-      "insertion_loss_db": 12.5
+        "manufacturer": "Exail",
+        "model": "MX-LN-40",
+        "type": "LiNbO3 Mach-Zehnder intensity modulator",
+        "bandwidth_ghz": 40,
+        "insertion_loss_db": 3.5,
+        "insertion_loss_max_db": 4.5
     }
-  },
+},
 
   "fiber": {
     "attenuation_db_per_km": 0.20,
@@ -24,19 +47,96 @@
   },
 
   "edfa": {
-    "gain_min_db": 16,
-    "gain_max_db": 20,
-    "noise_figure_db": 4.5
+    "manufacturer": "FS",
+    "model": "35924",
+    "type": "FMT-LA In-Line EDFA",
+    "wavelength_min_nm": 1528,
+    "wavelength_max_nm": 1564,
+
+    "gain_min_db": 15,
+    "gain_max_db": 33,
+
+    "noise_figure_db": 4.5,
+    "noise_figure_max_db": 6.0,
+
+    "input_power_min_dbm": -30,
+    "input_power_max_dbm": 5,
+
+    "saturated_output_power_max_dbm": 22
+},
+
+"wdm": {
+  "manufacturer": "FS",
+  "model": "26569",
+  "type": "16-channel dual-fiber DWDM MUX/DEMUX",
+  "channels": 16,
+  "channel_range": "C27-C42",
+  "channel_spacing_ghz": 100,
+  "connector": "LC/UPC",
+
+  "mux_insertion_loss_db": {
+    "design": 4.6,
+    "max": 4.6
   },
 
- "wdm": {
-  "mux_insertion_loss_db": {
-    "typical": 2.0,
-    "maximum": 2.4
-  },
   "demux_insertion_loss_db": {
-    "typical": 2.0,
-    "maximum": 2.4
+    "design": 4.6,
+    "max": 4.6
+  }
+},
+"receiver": {
+  "10g": {
+    "manufacturer": "Thorlabs",
+    "model": "DX30AF",
+    "type": "single-mode ultrafast photodetector",
+    "wavelength_min_nm": 750,
+    "wavelength_max_nm": 1650,
+    "bandwidth_ghz": 30,
+    "responsivity_a_per_w": 0.75,
+    "nep_pw_per_sqrt_hz": 32,
+    "fiber_type": "SMF-28",
+    "connector": "FC/PC"
+  },
+
+  "40g": {
+    "manufacturer": "Thorlabs",
+    "model": "DX50AF",
+    "type": "single-mode ultrafast photodetector",
+    "wavelength_min_nm": 1250,
+    "wavelength_max_nm": 1650,
+    "bandwidth_ghz": 50,
+    "responsivity_a_per_w": 0.70,
+    "nep_pw_per_sqrt_hz": 32,
+    "max_average_input_power_dbm": 10,
+    "dark_current_max_na": 50,
+    "fiber_type": "SMF-28",
+    "connector": "FC/PC"
+  }
+},
+"dispersion_compensation": {
+  "manufacturer": "Proximion",
+  "technology": "chirped FBG",
+
+  "long_span": {
+    "model": "DCM-HDC",
+    "type": "high dispersion compensation module",
+    "fiber_type": "G.652",
+    "compensation_length_min_km": 300,
+    "compensation_length_max_km": 600,
+    "insertion_loss_db": 3.7,
+    "optical_bandwidth_ghz": 1000,
+    "custom_dispersion": true
+  },
+
+  "standard_span": {
+    "model": "DCM-CB",
+    "type": "continuous-band dispersion compensation module",
+    "fiber_type": "G.652",
+    "compensation_length_min_km": 10,
+    "compensation_length_max_km": 140,
+    "insertion_loss_db": 3.7,
+    "optical_bandwidth_ghz": 5000,
+    "custom_dispersion": true
   }
 }
 }
