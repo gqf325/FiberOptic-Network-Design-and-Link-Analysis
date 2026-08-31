@@ -405,7 +405,12 @@ spans, this effect broadens the transmitted pulse in time and can eventually
 lead to inter-symbol interference.
 
 For each fiber link, the accumulated chromatic dispersion is calculated as
-$D_{\mathrm{link}} = D_{\mathrm{fiber}} L$
+
+$$
+D_{\mathrm{link}}
+=
+D_{\mathrm{fiber}} L
+$$
 
 where $D_{\mathrm{fiber}}$ is the fiber dispersion coefficient in
 ps/(nm·km) and $L$ is the link length in km.
@@ -413,31 +418,44 @@ ps/(nm·km) and $L$ is the link length in km.
 For example, the 320 km A–B link using a dispersion coefficient of
 18 ps/(nm·km) accumulates
 
-$
-D_{A-B} = 18 \times 320 = 5760\ \mathrm{ps/nm}$
+$$
+D_{A-B}
+=
+18 \times 320
+=
+5760\ \mathrm{ps/nm}
+$$
 
 For the NRZ-OOK channels, the optical spectral width is estimated using the
 baseline approximation
 
-$
-\Delta f \approx R_b,
-$
+$$
+\Delta f
+\approx
+R_b
+$$
 
 and converted to wavelength-domain spectral width using
 
-$
-\Delta \lambda \approx \frac{\lambda^2}{c}\Delta f.
-$
+$$
+\Delta \lambda
+\approx
+\frac{\lambda^2}{c}\Delta f
+$$
 
 The corresponding dispersion-induced pulse broadening is estimated as
 
-$
-\Delta T = |D_{\mathrm{total}}|\Delta\lambda.
-$
+$$
+\Delta T
+=
+\left|D_{\mathrm{total}}\right|
+\Delta \lambda
+$$
 
 Commercial dispersion-compensation modules are then applied according to the
 configuration in
 [`data/dispersion_compensation.json`](data/dispersion_compensation.json).
+
 The residual route dispersion is calculated as
 
 $$
@@ -445,7 +463,7 @@ D_{\mathrm{residual}}
 =
 \sum D_{\mathrm{fiber}}
 +
-\sum D_{\mathrm{DCM}}.
+\sum D_{\mathrm{DCM}}
 $$
 
 The selected DCM values nominally compensate the accumulated dispersion on
@@ -455,10 +473,10 @@ nominal residual dispersion of 0 ps/nm.
 
 Residual dispersion and the corresponding pulse broadening are evaluated for
 all wavelength-channel instances after compensation.
+
 The zero residual dispersion reported here represents nominal matching of the
 configured fiber and DCM parameters rather than perfect compensation in a
 physical implementation.
-
 ## 7. Key Results
 
 | Metric | Result |
