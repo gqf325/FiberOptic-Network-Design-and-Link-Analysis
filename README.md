@@ -232,7 +232,9 @@ $$
 Therefore, the implemented gain selection can be represented as
 
 $$
-G=\min\left(G_{\max},\max\left(G_{\min},L_{\mathrm{fiber}} + L_{\mathrm{DCM}}\right)\right)
+
+G = \min(G_{\max}, \max(G_{\min}, L_{\mathrm{fiber}} + L_{\mathrm{DCM}}))
+
 $$
 For channels that pass through node B without O/E/O regeneration, the endpoint
 EDFA of the upstream link must also provide sufficient optical power for the
