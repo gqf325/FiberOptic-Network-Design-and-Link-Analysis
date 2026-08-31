@@ -155,9 +155,7 @@ where all power and loss terms are expressed in dB or dBm.
 For each fiber span, the attenuation is calculated as
 
 $$
-L_{\mathrm{fiber}}
-=
-\alpha L
+L_{\mathrm{fiber}}=\alpha L
 $$
 
 where $\alpha$ is the fiber attenuation coefficient in dB/km and $L$ is the
@@ -169,15 +167,7 @@ according to its selected gain. In the dB domain, the power evolution can be
 expressed generally as
 
 $$
-P_{\mathrm{out}}
-=
-P_{\mathrm{in}}
--
-L_{\mathrm{fiber}}
--
-L_{\mathrm{DCM}}
-+
-G_{\mathrm{EDFA}}.
+P_{\mathrm{out}}=P_{\mathrm{in}}-L_{\mathrm{fiber}}-L_{\mathrm{DCM}}+G_{\mathrm{EDFA}}.
 $$
 
 For a channel that terminates at the destination node, an EDFA located exactly
@@ -230,37 +220,19 @@ amplifier.
 The initial gain can be expressed as
 
 $$
-G_{\mathrm{initial}}
-=
-L_{\mathrm{fiber}}
-+
-L_{\mathrm{DCM}}
+G_{\mathrm{initial}} = L_{\mathrm{fiber}} + L_{\mathrm{DCM}}
 $$
 
 and is constrained by the available EDFA gain range:
 
 $$
-15\ \mathrm{dB}
-\leq
-G
-\leq
-33\ \mathrm{dB}.
+15\ \mathrm{dB}\leq G \leq 33\ \mathrm{dB}.
 $$
 
 Therefore, the implemented gain selection can be represented as
 
 $$
-G
-=
-\min
-\left(
-G_{\max},
-\max
-\left(
-G_{\min},
-L_{\mathrm{fiber}} + L_{\mathrm{DCM}}
-\right)
-\right).
+G=\min\left(G_{\max},\max\left(G_{\min},L_{\mathrm{fiber}} + L_{\mathrm{DCM}}\right)\right).
 $$
 For channels that pass through node B without O/E/O regeneration, the endpoint
 EDFA of the upstream link must also provide sufficient optical power for the
@@ -282,9 +254,7 @@ Each EDFA generates additional ASE noise while amplifying the optical signal.
 For an EDFA with gain $G$, the generated ASE power is modeled as
 
 $$
-P_{\mathrm{ASE}}
-=
-2 n_{\mathrm{sp}} h \nu (G-1) B
+P_{\mathrm{ASE}}=2 n_{\mathrm{sp}} h \nu (G-1) B
 $$
 
 where $n_{\mathrm{sp}}$ is the spontaneous-emission factor, $h$ is Planck's
@@ -294,9 +264,7 @@ bandwidth.
 The spontaneous-emission factor is obtained from the EDFA noise figure:
 
 $$
-n_{\mathrm{sp}}
-=
-\frac{F}{2(1-1/G)}
+n_{\mathrm{sp}}=\frac{F}{2(1-1/G)}
 $$
 
 where $F$ and $G$ are expressed in linear units.
@@ -309,11 +277,7 @@ EDFA, newly generated ASE is then added to the propagated noise power.
 Therefore, the total ASE power after each amplifier can be represented as
 
 $$
-P_{\mathrm{ASE,out}}
-=
-G P_{\mathrm{ASE,in}}
-+
-P_{\mathrm{ASE,new}}
+P_{\mathrm{ASE,out}}=G P_{\mathrm{ASE,in}}+P_{\mathrm{ASE,new}}
 $$
 
 with the corresponding losses applied to the existing ASE before amplification.
@@ -321,22 +285,13 @@ with the corresponding losses applied to the existing ASE before amplification.
 At the end of the route, the optical SNR is calculated as
 
 $$
-\mathrm{SNR}_{\mathrm{optical}}
-=
-\frac{P_{\mathrm{signal}}}
-{P_{\mathrm{ASE}}}
+\mathrm{SNR}_{\mathrm{optical}}=\frac{P_{\mathrm{signal}}}{P_{\mathrm{ASE}}}
 $$
 
 or in decibels,
 
 $$
-\mathrm{SNR}_{\mathrm{optical,dB}}
-=
-10\log_{10}
-\left(
-\frac{P_{\mathrm{signal}}}
-{P_{\mathrm{ASE}}}
-\right).
+\mathrm{SNR}_{\mathrm{optical,dB}}=10\log_{10}\left(\frac{P_{\mathrm{signal}}}{P_{\mathrm{ASE}}}\right).
 $$
 
 The calculated optical SNR is finally compared with the minimum system
@@ -360,8 +315,7 @@ Because optical power decreases continuously along a lossy fiber, the effective
 length is shorter than the physical span length and is calculated as
 
 $$
-L_{\mathrm{eff}} =
-\frac{1-e^{-\alpha L}}{\alpha}
+L_{\mathrm{eff}} =\frac{1-e^{-\alpha L}}{\alpha}
 $$
 
 where $L$ is the physical fiber length and $\alpha$ is the linear attenuation
@@ -369,9 +323,7 @@ coefficient. The fiber attenuation specified in dB/km is first converted to
 linear units using
 
 $$
-\alpha =
-\alpha_{\mathrm{dB}}
-\frac{\ln(10)}{10}
+\alpha =\alpha_{\mathrm{dB}}\frac{\ln(10)}{10}
 $$
 
 For each wavelength channel, the input power of every fiber span is obtained
@@ -416,26 +368,19 @@ For the NRZ-OOK channels, the optical spectral width is estimated using the
 baseline approximation
 
 $$
-\Delta f
-\approx
-R_b
+\Delta f \approx R_b
 $$
 
 and converted to wavelength-domain spectral width using
 
 $$
-\Delta \lambda
-\approx
-\frac{\lambda^2}{c}\Delta f
+\Delta \lambda\approx\frac{\lambda^2}{c}\Delta f
 $$
 
 The corresponding dispersion-induced pulse broadening is estimated as
 
 $$
-\Delta T
-=
-\left|D_{\mathrm{total}}\right|
-\Delta \lambda
+\Delta T =\left|D_{\mathrm{total}}\right|\Delta \lambda
 $$
 
 Commercial dispersion-compensation modules are then applied according to the
@@ -445,11 +390,7 @@ configuration in
 The residual route dispersion is calculated as
 
 $$
-D_{\mathrm{residual}}
-=
-\sum D_{\mathrm{fiber}}
-+
-\sum D_{\mathrm{DCM}}
+D_{\mathrm{residual}}=\sum D_{\mathrm{fiber}}+\sum D_{\mathrm{DCM}}
 $$
 
 The selected DCM values nominally compensate the accumulated dispersion on
