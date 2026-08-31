@@ -385,9 +385,7 @@ from the simulated signal-power trace. The nonlinear phase shift is calculated
 independently for each span and accumulated over the complete optical route:
 
 $$
-\phi_{NL,\mathrm{total}}
-=
-\sum_{i=1}^{n}\phi_{NL,i}
+\phi_{NL,\mathrm{total}} = \sum_{i=1}^{n}\phi_{NL,i}
 $$
 
 The resulting total nonlinear phase is then checked against the system design
