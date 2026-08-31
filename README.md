@@ -217,7 +217,7 @@ immediately preceding the EDFA. This includes the attenuation of the preceding
 fiber span and, when applicable, the insertion loss of a DCM placed before the
 amplifier.
 
-The initial gain can be expressed as
+The initial gain is calculated as
 
 $$
 G_{\mathrm{initial}} = L_{\mathrm{fiber}} + L_{\mathrm{DCM}}
@@ -226,25 +226,36 @@ $$
 and is constrained by the available EDFA gain range:
 
 $$
-15\ \mathrm{dB}\leq G \leq 33\ \mathrm{dB}.
+15\ \mathrm{dB} \leq G \leq 33\ \mathrm{dB}
 $$
 
-Therefore, the implemented gain selection can be represented as
+If the calculated initial gain falls outside this range, it is limited to the
+nearest available gain boundary.
 
-$$
-
-G = min(G_{max}, max(G_{min}, L_{\mathrm{fiber}} + L_{\mathrm{DCM}}))
-
-$$
 For channels that pass through node B without O/E/O regeneration, the endpoint
 EDFA of the upstream link must also provide sufficient optical power for the
 next directed fiber. The simulation therefore checks each link transition used
 by transit traffic and increases the endpoint EDFA gain when necessary.
 
 Only the endpoint amplifier gain is adjusted during this refinement, and the
-final gain is still limited by the commercial maximum of 33 dB. If the required
+final gain remains limited by the commercial maximum of 33 dB. If the required
 downstream launch-power target cannot be reached within this gain limit, the
 configuration is marked as gain-limited.
+
+After the EDFA gains are determined, a safe per-channel launch-power target is
+calculated for each directed fiber. The launch power is limited by both the
+maximum transmitter output power and the maximum allowed output power of every
+EDFA along the link.
+
+The final launch-power target is therefore chosen so that:
+
+- the transmitter power does not exceed 2 mW per channel; and
+- the output power of every EDFA does not exceed 5 mW per channel.
+
+After any endpoint-gain refinement, the launch-power targets are recalculated
+using the final EDFA gain configuration before full-route propagation is
+performed.
+
 ### 6.3 ASE Noise and Optical SNR
 
 This design focuses on **optical SNR**, which is evaluated from the received
