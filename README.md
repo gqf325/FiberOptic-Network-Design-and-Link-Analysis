@@ -233,7 +233,7 @@ Therefore, the implemented gain selection can be represented as
 
 $$
 
-G = \min(G_{\max}, \max(G_{\min}, L_{\mathrm{fiber}} + L_{\mathrm{DCM}}))
+G = min(G_{max}, max(G_{min}, L_{\mathrm{fiber}} + L_{\mathrm{DCM}}))
 
 $$
 For channels that pass through node B without O/E/O regeneration, the endpoint
