@@ -147,13 +147,7 @@ after accounting for the insertion losses of the Mach-Zehnder modulator and
 the DWDM multiplexer:
 
 $$
-P_{\mathrm{launch}}
-=
-P_{\mathrm{Tx}}
--
-L_{\mathrm{MZM}}
--
-L_{\mathrm{MUX}}
+P_{\mathrm{launch}} =P_{\mathrm{Tx}} - L_{\mathrm{MZM}}-L_{\mathrm{MUX}}
 $$
 
 where all power and loss terms are expressed in dB or dBm.
@@ -405,9 +399,7 @@ lead to inter-symbol interference.
 For each fiber link, the accumulated chromatic dispersion is calculated as
 
 $$
-D_{\mathrm{link}}
-=
-D_{\mathrm{fiber}} L
+D_{\mathrm{link}} = D_{\mathrm{fiber}} L
 $$
 
 where $D_{\mathrm{fiber}}$ is the fiber dispersion coefficient in
@@ -417,11 +409,7 @@ For example, the 320 km A–B link using a dispersion coefficient of
 18 ps/(nm·km) accumulates
 
 $$
-D_{A-B}
-=
-18 \times 320
-=
-5760\ \mathrm{ps/nm}
+D_{A-B} = 18 \times 320 = 5760\ \mathrm{ps/nm}
 $$
 
 For the NRZ-OOK channels, the optical spectral width is estimated using the
